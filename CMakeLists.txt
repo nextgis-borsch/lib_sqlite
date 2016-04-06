@@ -26,6 +26,7 @@ set(SQLITE_HEADER_VERSION "${VER_H_MAJOR}.${VER_H_MINOR}.${VER_H_RELEASE}")
 set(SQLITE_SOURCE_VERSION "${VER_C_MAJOR}.${VER_C_MINOR}.${VER_C_RELEASE}")
 string(COMPARE NOTEQUAL ${SQLITE_HEADER_VERSION} ${SQLITE_SOURCE_VERSION} NOTEQUAL_VERSIONS)
 if(NOTEQUAL_VERSIONS)
+    # do this because source and header files have their versions defined twice
     message(FATAL_ERROR "Source and header files have different versions!")
 endif()
 
