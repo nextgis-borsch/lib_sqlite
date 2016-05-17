@@ -52,6 +52,9 @@ option(ENABLE_JSON1 "Include JSON SQL functions" ON)
 if(ENABLE_JSON1)
     add_definitions(-DSQLITE_ENABLE_JSON1)
 endif()
+
+configure_file(${CMAKE_MODULE_PATH}/cmake_uninstall.cmake.in ${CMAKE_BINARY_DIR}/cmake_uninstall.cmake IMMEDIATE @ONLY)
+
 # TODO: what else to add from options, especially for GDAL library?
 # https://www.sqlite.org/compile.html
 
@@ -83,6 +86,10 @@ if(BUILD_SHARED_LIBS)
 else()
     set(LIB_TYPE STATIC)
     set(LIB_NAME ${PROJECT_NAME}static)
+    if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX)
+        set( CMAKE_CXX_FLAGS "-fpic ${CMAKE_CXX_FLAGS}" )
+        set( CMAKE_C_FLAGS   "-fpic ${CMAKE_C_FLAGS}" )  
+    endif()
 endif()
 
 # Build
@@ -107,5 +114,4 @@ install(FILES ${AMALGAM_HEADER} DESTINATION ${INSTALL_INC_DIR})
 export(TARGETS ${LIB_NAME} FILE ${LIB_NAME}-exports.cmake EXPORT_LINK_INTERFACE_LIBRARIES)
 
 # Uninstall
-#configure_file(${CMAKE_MODULE_PATH}/cmake_uninstall.cmake.in ${CMAKE_BINARY_DIR}/cmake_uninstall.cmake IMMEDIATE @ONLY)
-#add_custom_target(uninstall COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake)
+add_custom_target(uninstall COMMAND ${CMAKE_COMMAND} -P ${CMAKE_BINARY_DIR}/cmake_uninstall.cmake)
