@@ -53,7 +53,7 @@ if(ENABLE_JSON1)
     add_definitions(-DSQLITE_ENABLE_JSON1)
 endif()
 
-configure_file(${CMAKE_MODULE_PATH}/cmake_uninstall.cmake.in ${CMAKE_BINARY_DIR}/cmake_uninstall.cmake IMMEDIATE @ONLY)
+configure_file(${CMAKE_SOURCE_DIR}/cmake/cmake_uninstall.cmake.in ${CMAKE_BINARY_DIR}/cmake_uninstall.cmake IMMEDIATE @ONLY)
 
 # TODO: what else to add from options, especially for GDAL library?
 # https://www.sqlite.org/compile.html
