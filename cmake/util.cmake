@@ -37,6 +37,10 @@ function(set_version major minor release filename)
     set(${major} ${VERSION_MAJOR} PARENT_SCOPE)
     set(${minor} ${VERSION_MINOR} PARENT_SCOPE)
     set(${release} ${VERSION_RELEASE} PARENT_SCOPE)
+
+    # Store version string in file for installer needs
+    file(TIMESTAMP ${CMAKE_SOURCE_DIR}/sqlite3.h VERSION_DATETIME "%Y-%m-%d %H:%M:%S" UTC)
+    file(WRITE ${CMAKE_BINARY_DIR}/version.str "${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_RELEASE}\n${VERSION_DATETIME}")
 endfunction()
 
 function(report_version name ver)
@@ -44,4 +48,4 @@ function(report_version name ver)
     set(BoldYellow  "${Esc}[1;33m")
     set(ColourReset "${Esc}[m")
     message(STATUS "${BoldYellow}${name} version ${ver}${ColourReset}")
-endfunction()    
+endfunction()
