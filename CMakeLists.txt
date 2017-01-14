@@ -102,6 +102,10 @@ endif()
 set(LIB_NAME ${PROJECT_NAME})
 if(BUILD_SHARED_LIBS)
     add_library(${LIB_NAME} SHARED ${AMALGAM_SOURCE})
+    if(MSVC)
+        set_target_properties(${LIB_NAME} PROPERTIES IMPORT_SUFFIX "_i.lib")
+    endif()
+    set_target_properties (${LIB_NAME} PROPERTIES DEFINE_SYMBOL SQLITE_EXPORTS) # NOTE: Patch header file!
 elseif(OSX_FRAMEWORK)
     add_library(${LIB_NAME} SHARED ${AMALGAM_SOURCE} ${AMALGAM_HEADER})
     set_target_properties(${LIB_NAME} PROPERTIES
