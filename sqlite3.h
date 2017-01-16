@@ -49,7 +49,7 @@ extern "C" {
 # define SQLITE_EXTERN extern
 #endif
 
-#if defined (_MSC_VER)
+#ifdef _MSC_VER
 #  ifdef SQLITE_EXPORTS
 #    ifdef __GNUC__
 #      define SQLITE_API __attribute__((dllexport))
@@ -71,7 +71,6 @@ extern "C" {
 #   endif
 #endif
 
-#endif
 #ifndef SQLITE_CDECL
 # define SQLITE_CDECL
 #endif
