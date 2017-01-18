@@ -3,7 +3,7 @@
 
 cmake_minimum_required(VERSION 2.8.12 FATAL_ERROR)
 
-project(sqlite3 C)
+project(sqlite3)
 
 # some init settings
 set(CMAKE_COLOR_MAKEFILE ON)
@@ -55,22 +55,51 @@ endif()
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 
+if(WIN32)
+    set(AMALGAM_SOURCE ${AMALGAM_SOURCE} sqlite3.rc)
+    add_definitions(-DUSE_FULLWARN=0 -DUSE_RUNTIME_CHECKS=0 -DUSE_CRT_DLL=1 -DSQLITE_CDECL=__cdecl -DSQLITE_APICALL=__stdcall -DSQLITE_CALLBACK=__stdcall -DSQLITE_SYSAPI=__stdcall -DSQLITE_API=__declspec(dllexport) -D_CRT_SECURE_NO_DEPRECATE -D_CRT_SECURE_NO_WARNINGS -D_CRT_NONSTDC_NO_DEPRECATE -D_CRT_NONSTDC_NO_WARNINGS -DSQLITE_THREADSAFE=1 -DSQLITE_THREAD_OVERRIDE_LOCK=-1 -DSQLITE_TEMP_STORE=1 -DSQLITE_MAX_TRIGGER_DEPTH=100 -DSQLITE_OS_WIN=1)
+endif()
+# SHELL_COMPILE_OPTS = $(SHELL_CCONV_OPTS) -DSQLITE_API=__declspec(dllimport)
+
+if(CMAKE_BUILD_TYPE STREQUAL "Debug" OR CMAKE_BUILD_TYPE STREQUAL "RelWithDebInfo")
+    add_definitions(-DDEBUG -D_DEBUG -DDEBUG_UNUSED)
+else()
+    add_definitions(-DNDEBUG -DDEBUG=0)
+endif()
+
 # Options
-option(ENABLE_FTS4 "Include the full-text search engine code in SQLite" ON)
-if(ENABLE_FTS4)
-    add_definitions(-DSQLITE_ENABLE_FTS4)
+if(WIN32)
+    option(ENABLE_FTS3 "Include the full-text search engine code in SQLite" ON)
+    if(ENABLE_FTS3)
+        add_definitions(-DSQLITE_ENABLE_FTS3=1)
+    endif()
+    # TODO: for Win10 - FTS4
+    # Also -DSQLITE_SYSTEM_MALLOC=1 -DSQLITE_OMIT_LOCALTIME=1
+else()
+    option(ENABLE_FTS5 "Include the full-text search engine code in SQLite" ON)
+    if(ENABLE_FTS5)
+        add_definitions(-DSQLITE_ENABLE_FTS5=1)
+    endif()
 endif()
 option(ENABLE_RTREE "Include the R-Tree extension" ON)
 if(ENABLE_RTREE)
-    add_definitions(-DSQLITE_ENABLE_RTREE)
+    add_definitions(-DSQLITE_ENABLE_RTREE=1)
 endif()
 option(ENABLE_COLUMN_METADATA "This enables some extra APIs that are required by some common systems, including Ruby-on-Rails" ON)
 if(ENABLE_COLUMN_METADATA)
-    add_definitions(-DSQLITE_ENABLE_COLUMN_METADATA)
+    add_definitions(-DSQLITE_ENABLE_COLUMN_METADATA=1)
 endif()
 option(ENABLE_JSON1 "Include JSON SQL functions" ON)
 if(ENABLE_JSON1)
     add_definitions(-DSQLITE_ENABLE_JSON1)
+endif()
+option(SQLITE_ENABLE_EXPLAIN_COMMENTS "Enable explain comments" ON)
+if(SQLITE_ENABLE_EXPLAIN_COMMENTS)
+    add_definitions(-DSQLITE_ENABLE_EXPLAIN_COMMENTS)
+endif()
+option(SQLITE_SESSION "Enable sessions" OFF)
+if(SQLITE_SESSION)
+    add_definitions(-DSQLITE_ENABLE_SESSION=1 -DSQLITE_ENABLE_PREUPDATE_HOOK=1)
 endif()
 
 configure_file(${CMAKE_SOURCE_DIR}/cmake/cmake_uninstall.cmake.in ${CMAKE_BINARY_DIR}/cmake_uninstall.cmake IMMEDIATE @ONLY)
@@ -105,7 +134,6 @@ if(BUILD_SHARED_LIBS)
     if(MSVC)
         set_target_properties(${LIB_NAME} PROPERTIES IMPORT_SUFFIX "_i.lib")
     endif()
-    set_target_properties (${LIB_NAME} PROPERTIES DEFINE_SYMBOL SQLITE_EXPORTS) # NOTE: Patch header file!
 elseif(OSX_FRAMEWORK)
     add_library(${LIB_NAME} SHARED ${AMALGAM_SOURCE} ${AMALGAM_HEADER})
     set_target_properties(${LIB_NAME} PROPERTIES
@@ -132,8 +160,6 @@ if(CMAKE_USE_PTHREADS_INIT)
   target_link_libraries(${LIB_NAME} ${EXTRA_LIBS})
 endif()
 
-# TODO: do we need set_target_properties() with version here?
-
 # TODO: build sqlite executable for tests.
 
 # Install
@@ -150,11 +176,21 @@ if(NOT SKIP_INSTALL_HEADERS AND NOT SKIP_INSTALL_ALL)
     install(FILES ${AMALGAM_HEADER} DESTINATION ${INSTALL_INC_DIR})
 endif()
 
-# Other
-export(TARGETS ${LIB_NAME} FILE ${LIB_NAME}-exports.cmake)
+
+if(MSVC)
+    set_property(TARGET ${LIB_NAME} APPEND PROPERTY
+        INTERFACE_COMPILE_DEFINITIONS
+            "SQLITE_API=__declspec(dllimport)"
+    )
+elseif(CMAKE_COMPILER_IS_GNUCC)
+    set_property(TARGET ${LIB_NAME} APPEND PROPERTY
+        INTERFACE_COMPILE_DEFINITIONS
+            "SQLITE_API=__attribute__((dllimport))"
+    )
+endif()
 
 if (REGISTER_PACKAGE)
-
+    export(TARGETS ${LIB_NAME} FILE ${LIB_NAME}-exports.cmake)
     set(EXPORT_PACKAGE_NAME SQLite3)
     set(EXPORT_PACKAGE_NAME_UPPER SQLITE3)
     set(EXPORT_PACKAGE_LIB_NAME ${LIB_NAME})
@@ -171,6 +207,8 @@ if (REGISTER_PACKAGE)
         ${CMAKE_CURRENT_BINARY_DIR}/${EXPORT_PACKAGE_NAME}ConfigVersion.cmake
         VERSION ${VERSION}
         COMPATIBILITY AnyNewerVersion )
+else()
+    export(TARGETS ${LIB_NAME} FILE ${LIB_NAME}-exports.cmake EXPORT_LINK_INTERFACE_LIBRARIES)
 endif()
 
 # Uninstall
