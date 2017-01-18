@@ -47,6 +47,7 @@ if(NOTEQUAL_VERSIONS)
 endif()
 
 set(VERSION ${SQLITE_HEADER_VERSION})
+set(RESOURCE_VERSION "${VER_H_MAJOR},${VER_H_MINOR},${VER_H_RELEASE},0")
 report_version(${PROJECT_NAME} ${VERSION})
 
 if(OSX_FRAMEWORK)
@@ -57,9 +58,25 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 
 if(WIN32)
     set(AMALGAM_SOURCE ${AMALGAM_SOURCE} sqlite3.rc)
-    add_definitions(-DUSE_FULLWARN=0 -DUSE_RUNTIME_CHECKS=0 -DUSE_CRT_DLL=1 -DSQLITE_CDECL=__cdecl -DSQLITE_APICALL=__stdcall -DSQLITE_CALLBACK=__stdcall -DSQLITE_SYSAPI=__stdcall -DSQLITE_API=__declspec(dllexport) -D_CRT_SECURE_NO_DEPRECATE -D_CRT_SECURE_NO_WARNINGS -D_CRT_NONSTDC_NO_DEPRECATE -D_CRT_NONSTDC_NO_WARNINGS -DSQLITE_THREADSAFE=1 -DSQLITE_THREAD_OVERRIDE_LOCK=-1 -DSQLITE_TEMP_STORE=1 -DSQLITE_MAX_TRIGGER_DEPTH=100 -DSQLITE_OS_WIN=1)
+    add_definitions(-DUSE_FULLWARN=0 
+        -DUSE_RUNTIME_CHECKS=0 
+        -DUSE_CRT_DLL=1 
+        "-DSQLITE_CDECL=__cdecl" 
+        "-DSQLITE_APICALL=__stdcall" 
+        "-DSQLITE_CALLBACK=__stdcall" 
+        "-DSQLITE_SYSAPI=__stdcall"
+        "-DSQLITE_API=__declspec(dllexport)" 
+        -D_CRT_SECURE_NO_DEPRECATE 
+        -D_CRT_SECURE_NO_WARNINGS 
+        -D_CRT_NONSTDC_NO_DEPRECATE 
+        -D_CRT_NONSTDC_NO_WARNINGS 
+        -DSQLITE_THREADSAFE=1 
+        -DSQLITE_THREAD_OVERRIDE_LOCK=-1 
+        -DSQLITE_TEMP_STORE=1 
+        -DSQLITE_MAX_TRIGGER_DEPTH=100 
+        -DSQLITE_OS_WIN=1
+        -DRC_VERONLY)
 endif()
-# SHELL_COMPILE_OPTS = $(SHELL_CCONV_OPTS) -DSQLITE_API=__declspec(dllimport)
 
 if(CMAKE_BUILD_TYPE STREQUAL "Debug" OR CMAKE_BUILD_TYPE STREQUAL "RelWithDebInfo")
     add_definitions(-DDEBUG -D_DEBUG -DDEBUG_UNUSED)
@@ -103,9 +120,7 @@ if(SQLITE_SESSION)
 endif()
 
 configure_file(${CMAKE_SOURCE_DIR}/cmake/cmake_uninstall.cmake.in ${CMAKE_BINARY_DIR}/cmake_uninstall.cmake IMMEDIATE @ONLY)
-
-# TODO: what else to add from options, especially for GDAL library?
-# https://www.sqlite.org/compile.html
+configure_file(${CMAKE_SOURCE_DIR}/cmake/sqlite3rc.h.cmake.in ${CMAKE_BINARY_DIR}/sqlite3rc.h IMMEDIATE @ONLY)
 
 find_package(Threads)
 if (Threads_FOUND)
