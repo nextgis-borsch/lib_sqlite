@@ -58,22 +58,22 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 
 if(WIN32)
     set(AMALGAM_SOURCE ${AMALGAM_SOURCE} sqlite3.rc)
-    add_definitions(-DUSE_FULLWARN=0 
-        -DUSE_RUNTIME_CHECKS=0 
-        -DUSE_CRT_DLL=1 
-        "-DSQLITE_CDECL=__cdecl" 
-        "-DSQLITE_APICALL=__stdcall" 
-        "-DSQLITE_CALLBACK=__stdcall" 
+    add_definitions(-DUSE_FULLWARN=0
+        -DUSE_RUNTIME_CHECKS=0
+        -DUSE_CRT_DLL=1
+        "-DSQLITE_CDECL=__cdecl"
+        "-DSQLITE_APICALL=__stdcall"
+        "-DSQLITE_CALLBACK=__stdcall"
         "-DSQLITE_SYSAPI=__stdcall"
-        "-DSQLITE_API=__declspec(dllexport)" 
-        -D_CRT_SECURE_NO_DEPRECATE 
-        -D_CRT_SECURE_NO_WARNINGS 
-        -D_CRT_NONSTDC_NO_DEPRECATE 
-        -D_CRT_NONSTDC_NO_WARNINGS 
-        -DSQLITE_THREADSAFE=1 
-        -DSQLITE_THREAD_OVERRIDE_LOCK=-1 
-        -DSQLITE_TEMP_STORE=1 
-        -DSQLITE_MAX_TRIGGER_DEPTH=100 
+        "-DSQLITE_API=__declspec(dllexport)"
+        -D_CRT_SECURE_NO_DEPRECATE
+        -D_CRT_SECURE_NO_WARNINGS
+        -D_CRT_NONSTDC_NO_DEPRECATE
+        -D_CRT_NONSTDC_NO_WARNINGS
+        -DSQLITE_THREADSAFE=1
+        -DSQLITE_THREAD_OVERRIDE_LOCK=-1
+        -DSQLITE_TEMP_STORE=1
+        -DSQLITE_MAX_TRIGGER_DEPTH=100
         -DSQLITE_OS_WIN=1
         -DRC_VERONLY)
 endif()
@@ -216,7 +216,7 @@ if (REGISTER_PACKAGE)
     configure_package_config_file(
         ${CMAKE_SOURCE_DIR}/cmake/PackageConfig.cmake.in
         ${CMAKE_CURRENT_BINARY_DIR}/${EXPORT_PACKAGE_NAME}Config.cmake
-        INSTALL_DESTINATION ${INSTALL_LIB_DIR}/cmake
+        INSTALL_DESTINATION ${CMAKE_CURRENT_BINARY_DIR}
         PATH_VARS INSTALL_INC_DIR )
     write_basic_package_version_file(
         ${CMAKE_CURRENT_BINARY_DIR}/${EXPORT_PACKAGE_NAME}ConfigVersion.cmake
