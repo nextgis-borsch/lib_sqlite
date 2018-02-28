@@ -70,7 +70,7 @@ else()
     set(INSTALL_CMAKECONF_DIR ${CMAKE_INSTALL_DATADIR}/${PROJECT_NAME}/CMake CACHE INTERNAL "Installation directory for cmake config files" FORCE)
 endif()
 
-set(AMALGAM_HEADER sqlite3.h)
+set(AMALGAM_HEADER sqlite3.h sqlite3ext.h)
 set(AMALGAM_SOURCE sqlite3.c)
 
 include(util)
