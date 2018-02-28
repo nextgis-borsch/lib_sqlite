@@ -231,6 +231,9 @@ endif()
 # Build sqlite executable for tests.
 add_executable(sqlite_app shell.c ${AMALGAM_HEADER})
 target_link_libraries(sqlite_app ${LIB_NAME})
+if(OSX_FRAMEWORK)
+    set_target_properties(sqlite_app PROPERTIES INSTALL_RPATH "@executable_path/../../Library/Frameworks")
+endif()
 set_target_properties(sqlite_app PROPERTIES OUTPUT_NAME ${PROJECT_NAME})
 
 set(PACKAGE_NAME ${PROJECT_NAME})
