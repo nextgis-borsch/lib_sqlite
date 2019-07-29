@@ -70,6 +70,10 @@ else()
     set(INSTALL_CMAKECONF_DIR ${CMAKE_INSTALL_DATADIR}/${PROJECT_NAME}/CMake CACHE INTERNAL "Installation directory for cmake config files" FORCE)
 endif()
 
+
+set(PACKAGE_NAME ${PROJECT_NAME})
+string(TOUPPER ${PACKAGE_NAME} PACKAGE_UPPER_NAME)
+
 set(AMALGAM_HEADER sqlite3.h sqlite3ext.h)
 set(AMALGAM_SOURCE sqlite3.c)
 
@@ -156,6 +160,12 @@ option(SQLITE_SESSION "Enable sessions" OFF)
 if(SQLITE_SESSION)
     add_definitions(-DSQLITE_ENABLE_SESSION=1 -DSQLITE_ENABLE_PREUPDATE_HOOK=1)
 endif()
+if(ENABLE_RTREE AND ENABLE_JSON1)
+    option(ENABLE_GEOPOLY "Include GeoJSON SQL functions" ON)
+    if(ENABLE_GEOPOLY)
+        add_definitions(-DSQLITE_ENABLE_GEOPOLY)
+    endif()
+endif()
 
 configure_file(${CMAKE_SOURCE_DIR}/cmake/cmake_uninstall.cmake.in ${CMAKE_BINARY_DIR}/cmake_uninstall.cmake IMMEDIATE @ONLY)
 configure_file(${CMAKE_SOURCE_DIR}/cmake/sqlite3rc.h.cmake.in ${CMAKE_BINARY_DIR}/sqlite3rc.h IMMEDIATE @ONLY)
@@ -235,9 +245,6 @@ if(OSX_FRAMEWORK)
     set_target_properties(sqlite_app PROPERTIES INSTALL_RPATH "@executable_path/../../Library/Frameworks")
 endif()
 set_target_properties(sqlite_app PROPERTIES OUTPUT_NAME ${PROJECT_NAME})
-
-set(PACKAGE_NAME ${PROJECT_NAME})
-string(TOUPPER ${PACKAGE_NAME} PACKAGE_UPPER_NAME)
 
 set(TARGETS ${LIB_NAME} sqlite_app)
 
