@@ -105,9 +105,14 @@ endfunction()
 
 function(get_cpack_filename ver name)
     get_compiler_version(COMPILER)
-    get_prefix(STATIC_PREFIX BUILD_STATIC_LIBS)
+    
+    if(NOT DEFINED BUILD_STATIC_LIBS)
+      set(BUILD_STATIC_LIBS OFF)
+    endif()
 
-    set(${name} ${PROJECT_NAME}-${ver}-${STATIC_PREFIX}${COMPILER} PARENT_SCOPE)
+    get_prefix(STATIC_PREFIX ${BUILD_STATIC_LIBS})
+
+    set(${name} ${PACKAGE_NAME}-${ver}-${STATIC_PREFIX}${COMPILER} PARENT_SCOPE)
 endfunction()
 
 function(get_compiler_version ver)

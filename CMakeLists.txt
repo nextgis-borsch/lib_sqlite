@@ -71,7 +71,7 @@ else()
 endif()
 
 
-set(PACKAGE_NAME ${PROJECT_NAME})
+set(PACKAGE_NAME sqlite)
 string(TOUPPER ${PACKAGE_NAME} PACKAGE_UPPER_NAME)
 
 set(AMALGAM_HEADER sqlite3.h sqlite3ext.h)
