@@ -170,8 +170,6 @@ endif()
 configure_file(${CMAKE_SOURCE_DIR}/cmake/cmake_uninstall.cmake.in ${CMAKE_BINARY_DIR}/cmake_uninstall.cmake IMMEDIATE @ONLY)
 configure_file(${CMAKE_SOURCE_DIR}/cmake/sqlite3rc.h.cmake.in ${CMAKE_BINARY_DIR}/sqlite3rc.h IMMEDIATE @ONLY)
 
-enable_testing()
-
 find_package(Threads)
 if (Threads_FOUND)
     if (CMAKE_USE_PTHREADS_INIT)
@@ -238,18 +236,23 @@ elseif(CMAKE_COMPILER_IS_GNUCC)
     )
 endif()
 
-# Build sqlite executable for tests.
-add_executable(sqlite_app shell.c ${AMALGAM_HEADER})
-target_link_libraries(sqlite_app ${LIB_NAME})
-if(OSX_FRAMEWORK)
-    set_target_properties(sqlite_app PROPERTIES INSTALL_RPATH "@executable_path/../../Library/Frameworks")
-endif()
-set_target_properties(sqlite_app PROPERTIES OUTPUT_NAME ${PROJECT_NAME})
+set(TARGETS ${LIB_NAME})
 
-set(TARGETS ${LIB_NAME} sqlite_app)
+option(BUILD_APP "Build sqlite3 command line utility" ON)
+if(BUILD_APP)
+    # Build sqlite executable for tests.
+    add_executable(sqlite_app shell.c ${AMALGAM_HEADER})
+    target_link_libraries(sqlite_app ${LIB_NAME})
+    if(OSX_FRAMEWORK)
+        set_target_properties(sqlite_app PROPERTIES INSTALL_RPATH "@executable_path/../../Library/Frameworks")
+    endif()
+    set_target_properties(sqlite_app PROPERTIES OUTPUT_NAME ${PROJECT_NAME})
+
+    set(TARGETS ${TARGETS} sqlite_app)
+endif()
 
 # Install
-if(NOT SKIP_INSTALL_LIBRARIES AND NOT SKIP_INSTALL_ALL )
+if(NOT SKIP_INSTALL_LIBRARIES AND NOT SKIP_INSTALL_ALL)
     install(TARGETS ${TARGETS}
         EXPORT ${PACKAGE_UPPER_NAME}Targets
         RUNTIME DESTINATION ${INSTALL_BIN_DIR} # at least for dlls
@@ -317,4 +320,7 @@ set(CPACK_PACKAGE_FILE_NAME ${PROJECT_CPACK_FILENAME})
 
 include(CPack)
 
-add_test(sqlite_app ${PROJECT_NAME} -version)
+if(BUILD_TESTINTG)
+    enable_testing()
+    add_test(sqlite_app ${PROJECT_NAME} -version)
+endif()
