@@ -238,8 +238,8 @@ endif()
 
 set(TARGETS ${LIB_NAME})
 
-option(BUILD_APP "Build sqlite3 command line utility" ON)
-if(BUILD_APP)
+option(BUILD_APPS "Build sqlite3 command line utility" ON)
+if(BUILD_APPS)
     # Build sqlite executable for tests.
     add_executable(sqlite_app shell.c ${AMALGAM_HEADER})
     target_link_libraries(sqlite_app ${LIB_NAME})
