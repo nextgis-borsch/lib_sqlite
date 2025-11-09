@@ -167,7 +167,7 @@ if(ENABLE_RTREE AND ENABLE_JSON1)
     endif()
 endif()
 
-configure_file(${CMAKE_SOURCE_DIR}/cmake/cmake_uninstall.cmake.in ${CMAKE_BINARY_DIR}/cmake_uninstall.cmake IMMEDIATE @ONLY)
+configure_file(${CMAKE_SOURCE_DIR}/cmake/borsch/cmake/cmake_uninstall.cmake.in ${CMAKE_BINARY_DIR}/cmake_uninstall.cmake IMMEDIATE @ONLY)
 configure_file(${CMAKE_SOURCE_DIR}/cmake/sqlite3rc.h.cmake.in ${CMAKE_BINARY_DIR}/sqlite3rc.h IMMEDIATE @ONLY)
 
 find_package(Threads)
@@ -179,17 +179,6 @@ if (Threads_FOUND)
 else()
     message(STATUS "threads package not found")
 endif()
-#if(NOT WIN32)
-#    find_library(DL_LIBRARY
-#        NAMES dl
-#        PATHS /usr/lib /usr/local/lib
-#        )
-#    if(NOT DL_LIBRARY)
-#        message(STATUS "dl lib not found")
-#    else()
-#        set(EXTRA_LIBS ${EXTRA_LIBS} ${DL_LIBRARY})
-#    endif()
-#endif()
 
 set(LIB_NAME ${PROJECT_NAME})
 if(BUILD_SHARED_LIBS)
@@ -289,7 +278,7 @@ if(REGISTER_PACKAGE)
 endif()
 
 # Create the ZLIBConfig.cmake file
-configure_file(cmake/PackageConfig.cmake.in
+configure_file(cmake/borsch/cmake/PackageConfig.cmake.in
     ${PROJECT_BINARY_DIR}/${PACKAGE_UPPER_NAME}Config.cmake @ONLY)
 
 if(NOT SKIP_INSTALL_LIBRARIES AND NOT SKIP_INSTALL_ALL)
@@ -320,7 +309,7 @@ set(CPACK_PACKAGE_FILE_NAME ${PROJECT_CPACK_FILENAME})
 
 include(CPack)
 
-if(BUILD_TESTINTG)
+if(BUILD_TESTING)
     enable_testing()
     add_test(sqlite_app ${PROJECT_NAME} -version)
 endif()
