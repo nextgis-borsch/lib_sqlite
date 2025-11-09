@@ -107,7 +107,6 @@ if(WIN32)
         "-DSQLITE_APICALL=__stdcall"
         "-DSQLITE_CALLBACK=__stdcall"
         "-DSQLITE_SYSAPI=__stdcall"
-        "-DSQLITE_API=__declspec(dllexport)"
         -D_CRT_SECURE_NO_DEPRECATE
         -D_CRT_SECURE_NO_WARNINGS
         -D_CRT_NONSTDC_NO_DEPRECATE
@@ -202,6 +201,15 @@ else()
         set( CMAKE_CXX_FLAGS "-fpic ${CMAKE_CXX_FLAGS}" )
         set( CMAKE_C_FLAGS   "-fpic ${CMAKE_C_FLAGS}" )
     endif()
+endif()
+
+if(WIN32)
+    target_compile_definitions(${LIB_NAME}
+        INTERFACE 
+            "-DSQLITE_API=__declspec(dllimport)"
+        PRIVATE
+            "-DSQLITE_API=__declspec(dllexport)"
+    )
 endif()
 
 set_target_properties(${LIB_NAME} PROPERTIES
