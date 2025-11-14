@@ -658,7 +658,11 @@ static sqlite3_int64 timeOfDay(void){
 #if defined(_WIN64)
   sqlite3_uint64 t;
   FILETIME tm;
+#if defined(NTDDI_WIN8) && NTDDI_VERSION >= NTDDI_WIN8
   GetSystemTimePreciseAsFileTime(&tm);
+#else
+  GetSystemTimeAsFileTime(&tm);
+#endif
   t =  ((u64)tm.dwHighDateTime<<32) | (u64)tm.dwLowDateTime;
   t += 116444736000000000LL;
   t /= 10;
