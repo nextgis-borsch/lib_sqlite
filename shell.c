@@ -658,7 +658,7 @@ static sqlite3_int64 timeOfDay(void){
 #if defined(_WIN64)
   sqlite3_uint64 t;
   FILETIME tm;
-#if defined(NTDDI_WIN8) && NTDDI_VERSION >= NTDDI_WIN8
+#ifdef _SKIP_FOR_NOW  // TODO: Fix it, condition "defined(NTDDI_WIN8) && NTDDI_VERSION >= NTDDI_WIN8" doesn't work
   GetSystemTimePreciseAsFileTime(&tm);
 #else
   GetSystemTimeAsFileTime(&tm);
