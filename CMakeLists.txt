@@ -263,7 +263,7 @@ endif()
 # Installing and packaging =====================================================
 
 include(${CMAKE_CURRENT_LIST_DIR}/cmake/borsch/cmake/packaging.cmake)
-create_borsch_package(${PACKAGE_NAME} 
+create_borsch_package(${PACKAGE_NAME}
     VENDOR ${PACKAGE_VENDOR}
     VERSION ${VERSION}
     TARGETS ${LIB_NAME}
