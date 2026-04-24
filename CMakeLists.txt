@@ -30,15 +30,9 @@
 
 cmake_minimum_required(VERSION 3.16.3 FATAL_ERROR)
 
-project(sqlite3)
-
-if(NOT DEFINED PACKAGE_VENDOR)
-    set(PACKAGE_VENDOR NextGIS)
-endif()
-
-if(NOT DEFINED PACKAGE_BUGREPORT)
-    set(PACKAGE_BUGREPORT info@nextgis.com)
-endif()
+project(SQLite3
+    VERSION 3.51.0
+)
 
 # some init settings
 set(CMAKE_COLOR_MAKEFILE ON)
@@ -75,25 +69,10 @@ string(TOUPPER ${PACKAGE_NAME} PACKAGE_UPPER_NAME)
 set(AMALGAM_HEADER sqlite3.h sqlite3ext.h)
 set(AMALGAM_SOURCE sqlite3.c)
 
-include(${CMAKE_CURRENT_LIST_DIR}/cmake/util.cmake)
-set_version(VER_H_MAJOR VER_H_MINOR VER_H_RELEASE ${AMALGAM_HEADER})
-set_version(VER_C_MAJOR VER_C_MINOR VER_C_RELEASE ${AMALGAM_SOURCE})
-set(SQLITE_HEADER_VERSION "${VER_H_MAJOR}.${VER_H_MINOR}.${VER_H_RELEASE}")
-set(SQLITE_SOURCE_VERSION "${VER_C_MAJOR}.${VER_C_MINOR}.${VER_C_RELEASE}")
-string(COMPARE NOTEQUAL ${SQLITE_HEADER_VERSION} ${SQLITE_SOURCE_VERSION} NOTEQUAL_VERSIONS)
-if(NOTEQUAL_VERSIONS)
-    # do this because source and header files have their versions defined twice
-    message(FATAL_ERROR "Source and header files have different versions!")
-endif()
-
-include(${CMAKE_CURRENT_LIST_DIR}/cmake/borsch/cmake/version.cmake)
-
-set(VERSION ${SQLITE_HEADER_VERSION})
-set(RESOURCE_VERSION "${VER_H_MAJOR},${VER_H_MINOR},${VER_H_RELEASE},0")
-report_version(${PROJECT_NAME} ${VERSION})
+set(RESOURCE_VERSION "${PROJECT_VERSION_MAJOR},${PROJECT_VERSION_MINOR},${PROJECT_VERSION_PATCH},0")
 
 if(OSX_FRAMEWORK)
-    set(FRAMEWORK_VERSION "${VER_H_MAJOR}")
+    set(FRAMEWORK_VERSION "${PROJECT_VERSION_MAJOR}")
 endif()
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
@@ -178,12 +157,9 @@ else()
     message(STATUS "threads package not found")
 endif()
 
-set(LIB_NAME ${PROJECT_NAME})
+set(LIB_NAME sqlite3)
 if(BUILD_SHARED_LIBS)
     add_library(${LIB_NAME} SHARED ${AMALGAM_SOURCE})
-    if(MSVC)
-        set_target_properties(${LIB_NAME} PROPERTIES IMPORT_SUFFIX "_i.lib")
-    endif()
 elseif(OSX_FRAMEWORK)
     add_library(${LIB_NAME} SHARED ${AMALGAM_SOURCE} ${AMALGAM_HEADER})
     set_target_properties(${LIB_NAME} PROPERTIES
@@ -248,7 +224,7 @@ if(BUILD_APPS)
     if(OSX_FRAMEWORK)
         set_target_properties(sqlite_app PROPERTIES INSTALL_RPATH "@executable_path/../../Library/Frameworks")
     endif()
-    set_target_properties(sqlite_app PROPERTIES OUTPUT_NAME ${PROJECT_NAME})
+    set_target_properties(sqlite_app PROPERTIES OUTPUT_NAME sqlite3)
 
     set(TARGETS ${TARGETS} sqlite_app)
 endif()
@@ -261,11 +237,12 @@ if(BUILD_TESTING)
 endif()
 
 # Installing and packaging =====================================================
+add_library(SQLite3 ALIAS ${LIB_NAME})
 
-include(${CMAKE_CURRENT_LIST_DIR}/cmake/borsch/cmake/packaging.cmake)
-create_borsch_package(${PACKAGE_NAME}
-    VENDOR ${PACKAGE_VENDOR}
-    VERSION ${VERSION}
-    TARGETS ${LIB_NAME}
+include(${CMAKE_CURRENT_LIST_DIR}/cmake/borsch/cmake/BorschPackaging.cmake)
+create_borsch_package(${PROJECT_NAME}
+    VERSION ${PROJECT_VERSION}
+    LIBRARIES SQLite3
+    EXECUTABLES sqlite_app
     HEADERS ${AMALGAM_HEADER}
 )
